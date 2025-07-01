@@ -5,11 +5,13 @@
 #include <sstream>
 #include "Logger.h"
 #include <mutex>
+#include <iostream>
 
-    std::mutex mtx;
+    std::mutex  mtx;
     std::ofstream file;
-    Logger::Logger()  : file("log.txt",std::ios::app)
+    Logger::Logger()  : file("/home/vitaliy/Рабочий стол/QT/testChain/log.txt",std::ios::app)
     {
+
         if(!file.is_open())
         {
             throw std::runtime_error("Failed to open log.txt");
@@ -30,7 +32,7 @@
         ss<<std::put_time(localTime,"%Y-%m-%d %H:%M:%S");
         std::string timestamp=ss.str();
 
-        file<<" [" << timestamp<< "] "<<message<<"\n";
+        file<<" [" << timestamp<< "] "<<message<<"\n";file.flush();
 
 
     }

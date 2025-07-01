@@ -1,4 +1,4 @@
-#ifndef LOGGER_H
+    #ifndef LOGGER_H
 #define LOGGER_H
 #include <fstream>
 #include <string>
@@ -6,7 +6,7 @@
 
 class Logger {
 private:
-    std::mutex mtx;
+  std::mutex mtx;
     std::ofstream file;
     Logger();
     ~Logger();

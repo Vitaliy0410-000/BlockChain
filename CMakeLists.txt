@@ -10,8 +10,10 @@ add_executable(testChain main.cpp
 
     Logger.cpp
     Logger.h
+    BlockFactory.h BlockFactory.cpp
+    RegularBlock.h RegularBlock.cpp
+    BlockChain.h BlockChain.cpp
     log.txt
-    blockfactory.h blockfactory.cpp
 )
 
 find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)

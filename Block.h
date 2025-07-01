@@ -38,6 +38,14 @@ public:
         }
 
     };
+    std::string getHash()const
+    {
+        return hash;
+    }
+    std::string getPrevHash()
+    {
+        return prevHash;
+    }
     virtual std::string calculateHash() const=0;//func for create hash on index, timestamp, data, prevHash и nonce
     virtual void mineBlock(int difficulty )=0;
 };
@@ -47,7 +55,7 @@ public:
 
 
 class Genesis : public Block {
-    friend class BlockFactory;
+    friend class GenesisFactory;
 private:
     Genesis(int index, long long timestamp, std::string data, std::string prevHash, int nonce);
     Genesis(const Genesis&) = delete;
