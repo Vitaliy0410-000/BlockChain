@@ -5,6 +5,10 @@
 #include "Logger.h"
 #include <ctime>
 #include <string>
+#include "RegularBlock.h"
+#include <mutex>
+#include <nlohmann/json.hpp>
+
 
 Blockchain::Blockchain(int difficulty)
 {
@@ -18,18 +22,23 @@ Blockchain::Blockchain(int difficulty)
     {
         throw std::runtime_error("Failed to create Genesis block");
     }
-    genesis->mineBlock(difficulty);
+    genesis->mineBlockParallel(difficulty, 4);
     chain.push_back(std::move(genesis));
-    Logger::getInstance().log("[INFO] Initialized Blockchain with Genesis block");
+    Logger::getInstance().log("Initialized Blockchain with Genesis block");
 }
 Blockchain* Blockchain::instance = nullptr;
+
+ std::mutex Blockchain::instanceMutex;
+std::mutex Blockchain::chainMutex;
+
+
 void Blockchain::addBlock(std::string data)
 {
     if (data.empty())
     {
         throw std::invalid_argument("Data cannot be empty");
     }
-    Logger::getInstance().log("[2025-07-01 20:57:xx] [INFO] Chain size: " + std::to_string(chain.size()));
+    Logger::getInstance().log("  Chain size: " + std::to_string(chain.size()));
     auto block = RegularBlockFactory().createRegularBlock(chain.size(), std::time(nullptr), data, chain.back()->getHash(), 0);
     if(chain.empty())
     {
@@ -39,19 +48,19 @@ void Blockchain::addBlock(std::string data)
     {
         throw std::runtime_error("Failed to create RegularBlock");
     }
-    block->mineBlock(difficulty);
+    block->mineBlockParallel(difficulty, 4);
     chain.push_back(std::move(block));
-    Logger::getInstance().log("[INFO] Added block with index=" + std::to_string(chain.size() - 1));
+    Logger::getInstance().log("Added block with index=" + std::to_string(chain.size() - 1));
 }
 
 bool Blockchain::isChainValid()
 {
-    Logger::getInstance().log("[2025-07-01 20:57:xx] [INFO] Validating chain with size: " + std::to_string(chain.size()));
+    Logger::getInstance().log("Validating chain with size: " + std::to_string(chain.size()));
     for (size_t i = 1; i < chain.size(); ++i)
     {
         if (chain[i]->getPrevHash() != chain[i - 1]->getHash())
         {
-            Logger::getInstance().log("[ERROR] Chain invalid at index=" + std::to_string(i));
+            Logger::getInstance().log("Chain invalid at index=" + std::to_string(i));
             return false;
         }
     }
@@ -59,13 +68,24 @@ bool Blockchain::isChainValid()
     {
         return false;
     }
-    Logger::getInstance().log("[INFO] Chain is valid");
+    Logger::getInstance().log("Chain is valid");
     return true;
 }
 
-std::string Blockchain::getChainInfo()
+std::string Blockchain::getChainInfo()const
 {
-    return "Chain size=" + std::to_string(chain.size()) + ", last hash=" + chain.back()->getHash();
+     std::lock_guard<std::mutex>lock(chainMutex);
+    nlohmann::json array = nlohmann::json::array();
+    for(const auto& block : chain)
+    {
+        nlohmann::json obj;
+        obj["index"]=block->getIndex();
+        obj["hash"]=block->getHash();
+        array.push_back(obj);
+    }
+    std::string result = array.dump(4);
+    Logger::getInstance().log("Chain info: " + result);
+    return result;
 }
 
 Blockchain& Blockchain::getInstance(int difficulty)
@@ -74,6 +94,6 @@ Blockchain& Blockchain::getInstance(int difficulty)
     {
        instance = new Blockchain(difficulty);
     }
-    Logger::getInstance().log("[2025-07-01 21:14:xx] [DEBUG] Blockchain getInstance called");
+    Logger::getInstance().log("Blockchain getInstance called");
     return *instance;
 }

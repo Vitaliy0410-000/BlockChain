@@ -2,6 +2,11 @@
 #define BLOCK_H
 #include <string>
 #include <iostream>
+#include <thread>
+#include <atomic>
+#include <vector>
+
+
 
 class Block
 {
@@ -38,16 +43,18 @@ public:
         }
 
     };
-    std::string getHash()const
-    {
-        return hash;
-    }
+
     std::string getPrevHash()
     {
         return prevHash;
     }
     virtual std::string calculateHash() const=0;//func for create hash on index, timestamp, data, prevHash и nonce
-    virtual void mineBlock(int difficulty )=0;
+    virtual void mineBlockParallel(int difficulty, int numThreads) = 0;
+    virtual void mineBlock(int difficulty)=0;
+    virtual int getIndex()const =0;
+
+    virtual std::string getHash()const =0;
+
 };
 
 
@@ -66,10 +73,14 @@ public:
     static const long long timestamp;
     static constexpr std::string_view data = "Genesis Block";
     static constexpr std::string_view prevHash = "0";
+    int getIndex() const override;
+    std::string getHash() const override;
+    std::string getPrevHash() const;
 
     static Genesis& getInstance();
     std::string calculateHash() const override;
-    void mineBlock(int difficulty) override;
+   void mineBlockParallel(int difficulty, int numThreads) override;
+    void  mineBlock(int difficulty)override;
 };
 //int difficulty  complexity mineng
 #endif // BLOCK_H

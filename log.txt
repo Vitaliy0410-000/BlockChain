@@ -1,25 +1,24 @@
-
- [2025-07-01 21:32:38] [2025-07-01 21:04:xx] === New Test Session ===
- [2025-07-01 21:32:38] Starting blockchain test
- [2025-07-01 21:32:38] Created block type: BLOCKCHAIN
- [2025-07-01 21:32:38] Created block type: GENESIS BLOCK
- [2025-07-01 21:32:38] Create Genesis block with index=0
- [2025-07-01 21:32:38] Started mining Genesis block with difficulty= 2
- [2025-07-01 21:32:38] Mined Genesis block: nonce=250 ,hash= 00b072f0503fea7315abdced94ece599b8095d456c3793146dad6f52d45be2a0
- [2025-07-01 21:32:38] [INFO] Initialized Blockchain with Genesis block
- [2025-07-01 21:32:38] [2025-07-01 21:14:xx] [DEBUG] Blockchain getInstance called
- [2025-07-01 21:32:38] [2025-07-01 20:57:xx] [INFO] Chain size: 1
- [2025-07-01 21:32:38] Created block type: REGULAR BLOCK
- [2025-07-01 21:32:38] Create Regular block with index=1
- [2025-07-01 21:32:38] Started mining Regular block with difficulty= 2
- [2025-07-01 21:32:38] Mined Regular block: nonce=228 ,hash= 00c3a54301179ce691e4c070563b3020492b3197ff1ca98f5f40c3ec43900aa4
- [2025-07-01 21:32:38] [INFO] Added block with index=1
- [2025-07-01 21:32:38] [2025-07-01 20:57:xx] [INFO] Chain size: 2
- [2025-07-01 21:32:38] Created block type: REGULAR BLOCK
- [2025-07-01 21:32:38] Create Regular block with index=2
- [2025-07-01 21:32:38] Started mining Regular block with difficulty= 2
- [2025-07-01 21:32:38] Mined Regular block: nonce=235 ,hash= 0079bad8f3025d5570369b4e7ba3f9f8f196d437026509eb5904e053a12c1217
- [2025-07-01 21:32:38] [INFO] Added block with index=2
- [2025-07-01 21:32:38] [2025-07-01 20:57:xx] [INFO] Validating chain with size: 3
- [2025-07-01 21:32:38] [INFO] Chain is valid
- [2025-07-01 21:32:38] [2025-07-01 20:45:xx] [INFO] Chain validation passed
+ [2025-07-17 20:56:31]  === New Test Session ===
+ [2025-07-17 20:56:31] Starting blockchain test
+ [2025-07-17 20:56:31] Created block type: BLOCKCHAIN
+ [2025-07-17 20:56:31] Created block type: GENESIS BLOCK
+ [2025-07-17 20:56:31] Create Genesis block with index=0
+ [2025-07-17 20:56:31] Started mining Genesis block in 4 threads
+ [2025-07-17 20:56:31] Mined Genesis block: nonce=1049, hash=001e44aa56f795b909e0de5f391c958bc011fcb058c818c8ad4a3e9ddc9422a7
+ [2025-07-17 20:56:31] Initialized Blockchain with Genesis block
+ [2025-07-17 20:56:31] Blockchain getInstance called
+ [2025-07-17 20:56:31]   Chain size: 1
+ [2025-07-17 20:56:31] Created block type: REGULAR BLOCK
+ [2025-07-17 20:56:31] Create Regular block with index=1
+ [2025-07-17 20:56:31] Started mining Regular block in 4 threads
+ [2025-07-17 20:56:31] Mined Regular block: nonce=53, hash=00e830d40acc69396a617e6bb61687b6f10e47e46c035a9706897223f60f67d9
+ [2025-07-17 20:56:31] Added block with index=1
+ [2025-07-17 20:56:31]   Chain size: 2
+ [2025-07-17 20:56:31] Created block type: REGULAR BLOCK
+ [2025-07-17 20:56:31] Create Regular block with index=2
+ [2025-07-17 20:56:31] Started mining Regular block in 4 threads
+ [2025-07-17 20:56:31] Mined Regular block: nonce=232, hash=0085503ede90f645bb37145089de0e899dcc73c8445e5ff36b72b9b1a4740230
+ [2025-07-17 20:56:31] Added block with index=2
+ [2025-07-17 20:56:31] Validating chain with size: 3
+ [2025-07-17 20:56:31] Chain is valid
+ [2025-07-17 20:56:31]  [INFO] Chain validation passed

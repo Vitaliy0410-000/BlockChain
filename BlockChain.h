@@ -8,15 +8,19 @@
 #include "BlockFactory.h"
 #include "Logger.h"
 #include "Block.h"
+#include <mutex>
+#include <thread>
 
 class Blockchain
 {
 public:
+    static std::mutex instanceMutex;
+    static std::mutex chainMutex;
     static Blockchain& getInstance(int difficulty = 2);
 
     void addBlock(std::string data);
     bool isChainValid();
-    std::string getChainInfo();
+    std::string getChainInfo()const;
 
 private:
     Blockchain(int difficulty);

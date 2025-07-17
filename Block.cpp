@@ -5,6 +5,12 @@
 #include <sstream>
 #include <string_view>
 #include "Logger.h"
+#include <thread>
+#include <atomic>
+#include <vector>
+
+
+
 using std::string;
 using std::cout;
 using std::endl;
@@ -48,11 +54,12 @@ using std::endl;
      }
     void Genesis::mineBlock(int difficulty)
     {
+        std::string target(difficulty, '0');
         if (difficulty < 0)
         {
         throw std::invalid_argument("Difficulty must be positive!");
         }
-        string target(difficulty,'0');
+
         Logger::getInstance().log("Started mining Genesis block with difficulty= " + std::to_string(difficulty));
         while(true)
         {
@@ -68,3 +75,54 @@ using std::endl;
 
     }
 
+    void Genesis::mineBlockParallel(int difficulty, int numThreads) {
+        if (difficulty <= 0) {
+            throw std::invalid_argument("Difficulty must be positive!");
+        }
+
+        std::atomic<bool> found(false); // Волшебный звонок: "нашли ключ?"
+        std::string target(difficulty, '0'); // Образец: "00" для 2 нулей
+        int foundNonce = 0; // Коробка для номера ключа
+        std::string foundHash; // Коробка для хеша
+
+        Logger::getInstance().log("Started mining Genesis block in " + std::to_string(numThreads) + " threads");
+
+        auto mineRange = [this, &found, &target, &foundNonce, &foundHash, difficulty](int start, int step) {
+            while (!found) {
+                this->nonce = start; // Проверяем число
+                std::string currentHash = calculateHash(); // Вычисляем хеш
+                if (currentHash.substr(0, difficulty) == target) { // Если хеш подходит
+                    foundNonce = start; // Сохраняем номер
+                    foundHash = currentHash; // Сохраняем хеш
+                    found = true; // Звоним в звонок: "Стоп!"
+                    return;
+                }
+                start += step; // Берём следующее число (0,4,8,...)
+            }
+        };
+
+        std::vector<std::thread> threads;
+        for (int i = 0; i < numThreads; ++i) {
+            threads.emplace_back(mineRange, i, numThreads); // Нанимаем 4 рабочих
+        }
+
+        for (auto& t : threads) {
+            t.join(); // Ждём, пока все закончат
+        }
+
+        this->nonce = foundNonce; // Сохраняем номер ключа
+        this->hash = foundHash; // Сохраняем хеш
+
+        Logger::getInstance().log("Mined Genesis block: nonce=" + std::to_string(this->nonce) + ", hash=" + this->hash);
+    }
+    int Genesis::getIndex() const {
+        return index;
+    }
+
+    std::string Genesis::getHash() const {
+        return hash;
+    }
+
+    std::string Genesis::getPrevHash() const {
+        return std::string(prevHash);
+    }

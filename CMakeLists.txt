@@ -16,6 +16,16 @@ add_executable(testChain main.cpp
     log.txt
 )
 
+find_package(nlohmann_json 3.12.0 REQUIRED)
+
+
+if (nlohmann_json_FOUND)
+    message(STATUS "nlohmann/json found. Linking to target testChain.")
+else()
+    message(FATAL_ERROR "nlohmann/json not found! Please install nlohmann/json development libraries.")
+endif()
+
+
 find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
 
 # 2. Если OpenSSL найден, добавить его к нашему исполняемому файлу
@@ -27,7 +37,11 @@ if (OPENSSL_FOUND)
     target_include_directories(testChain PRIVATE ${OPENSSL_INCLUDE_DIR})
 
     # Прилинковать библиотеки OpenSSL к нашему исполняемому файлу
-    target_link_libraries(testChain PRIVATE ${OPENSSL_LIBRARIES})
+    target_link_libraries(testChain PRIVATE
+        OpenSSL::SSL
+        OpenSSL::Crypto
+        nlohmann_json::nlohmann_json # Здесь добавляем nlohmann/json
+    )
 else()
     message(FATAL_ERROR "OpenSSL not found! Please install OpenSSL development libraries.")
 endif()
