@@ -4,7 +4,6 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include "Block.h"
 #include "BlockFactory.h"
 #include "Logger.h"
 #include "Block.h"

@@ -8,16 +8,21 @@
 #include <thread>
 #include <atomic>
 #include <vector>
-
+#include "Transaction.h"
 
 
 using std::string;
 using std::cout;
 using std::endl;
 
+void Block::addTransaction(Transaction transaction)
+{
+    transactions.push_back(std::move(transaction));
+    Logger::getInstance().log("Added transaction: " + transaction.toString());
+}
 
-    Genesis::Genesis(int index,long long timestamp,string data,string prevHash,int nonce)
-        :Block(index,timestamp,data,prevHash,nonce)
+    Genesis::Genesis(int index,long long timestamp,std::vector<Transaction>transactions,string prevHash,int nonce)
+        :Block(index,timestamp,transactions,prevHash,nonce)
     {
         Logger::getInstance().log("Create Genesis block with index=0");
     };
@@ -25,18 +30,29 @@ using std::endl;
 
    Genesis& Genesis::getInstance()
     {
-        static Genesis instance(index,timestamp,string(data),string(prevHash),0);
+       static Genesis instance(index,timestamp,std::vector<Transaction>{},string(prevHash),0);
         return instance;
     }
     const int Genesis:: index=0;
-     const long long Genesis:: timestamp = 21062025;
-    constexpr std::string_view Genesis:: data;
-     constexpr std::string_view Genesis:: prevHash;
+    const long long Genesis:: timestamp = 21062025;
 
     string Genesis::calculateHash() const
     {
+        std::string transactionsStr;
+        for(auto it= transactions.begin();it!=transactions.end();it++)
+        {
+            std::string currentTransactionString = it->toString();
+            if (!transactionsStr.empty())
+            {
+                transactionsStr += ";";
+            }
+            transactionsStr += currentTransactionString;
+        }
+
+
+
         std::stringstream ss;
-        ss<<index<< ":" <<timestamp<< ":" <<data<< ":" <<prevHash<< ":" <<nonce;
+        ss << index << ":" << timestamp << ":" << transactionsStr << ":" << prevHash << ":" << nonce;
         string blockData=ss.str();
         unsigned char hash[SHA256_DIGEST_LENGTH];
         SHA256_CTX sha256;
@@ -48,7 +64,6 @@ using std::endl;
         {
             ss_hex<<std::hex<<std::setw(2)<<std::setfill('0')<<(int)hash[i];
         }
-         std::string hashStr = ss_hex.str();
         return ss_hex.str();
 
      }
@@ -75,8 +90,17 @@ using std::endl;
 
     }
 
-    void Genesis::mineBlockParallel(int difficulty, int numThreads) {
-        if (difficulty <= 0) {
+    const std::vector<Transaction>& Genesis::getTransactions() const
+    {
+        return transactions;
+    }
+
+
+
+    void Genesis::mineBlockParallel(int difficulty, int numThreads)
+    {
+        if (difficulty <= 0)
+        {
             throw std::invalid_argument("Difficulty must be positive!");
         }
 
@@ -87,11 +111,14 @@ using std::endl;
 
         Logger::getInstance().log("Started mining Genesis block in " + std::to_string(numThreads) + " threads");
 
-        auto mineRange = [this, &found, &target, &foundNonce, &foundHash, difficulty](int start, int step) {
-            while (!found) {
+        auto mineRange = [this, &found, &target, &foundNonce, &foundHash, difficulty](int start, int step)
+        {
+            while (!found)
+            {
                 this->nonce = start; // Проверяем число
                 std::string currentHash = calculateHash(); // Вычисляем хеш
-                if (currentHash.substr(0, difficulty) == target) { // Если хеш подходит
+                if (currentHash.substr(0, difficulty) == target)
+                { // Если хеш подходит
                     foundNonce = start; // Сохраняем номер
                     foundHash = currentHash; // Сохраняем хеш
                     found = true; // Звоним в звонок: "Стоп!"
@@ -102,11 +129,13 @@ using std::endl;
         };
 
         std::vector<std::thread> threads;
-        for (int i = 0; i < numThreads; ++i) {
+        for (int i = 0; i < numThreads; ++i)
+        {
             threads.emplace_back(mineRange, i, numThreads); // Нанимаем 4 рабочих
         }
 
-        for (auto& t : threads) {
+        for (auto& t : threads)
+        {
             t.join(); // Ждём, пока все закончат
         }
 
@@ -115,14 +144,17 @@ using std::endl;
 
         Logger::getInstance().log("Mined Genesis block: nonce=" + std::to_string(this->nonce) + ", hash=" + this->hash);
     }
-    int Genesis::getIndex() const {
+    int Genesis::getIndex() const
+    {
         return index;
     }
 
-    std::string Genesis::getHash() const {
+    std::string Genesis::getHash() const
+    {
         return hash;
     }
 
-    std::string Genesis::getPrevHash() const {
-        return std::string(prevHash);
+    std::string Genesis::getPrevHash()const
+    {
+        return Block::getPrevHash();
     }

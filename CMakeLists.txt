@@ -14,6 +14,7 @@ add_executable(testChain main.cpp
     RegularBlock.h RegularBlock.cpp
     BlockChain.h BlockChain.cpp
     log.txt
+    Transaction.h Transaction.cpp
 )
 
 find_package(nlohmann_json 3.12.0 REQUIRED)

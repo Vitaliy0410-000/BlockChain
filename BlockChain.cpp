@@ -38,7 +38,7 @@ void Blockchain::addBlock(std::string data)
     {
         throw std::invalid_argument("Data cannot be empty");
     }
-    Logger::getInstance().log("  Chain size: " + std::to_string(chain.size()));
+    Logger::getInstance().log("Chain size: " + std::to_string(chain.size()));
     auto block = RegularBlockFactory().createRegularBlock(chain.size(), std::time(nullptr), data, chain.back()->getHash(), 0);
     if(chain.empty())
     {
