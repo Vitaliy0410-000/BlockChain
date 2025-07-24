@@ -15,6 +15,8 @@ add_executable(testChain main.cpp
     BlockChain.h BlockChain.cpp
     log.txt
     Transaction.h Transaction.cpp
+    Blockk.cpp
+    SmartContract.h SmartContract.cpp
 )
 
 find_package(nlohmann_json 3.12.0 REQUIRED)

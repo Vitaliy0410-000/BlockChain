@@ -7,7 +7,6 @@
 #include <vector>
 #include "Transaction.h"
 
-
 class Block
 {
 protected:

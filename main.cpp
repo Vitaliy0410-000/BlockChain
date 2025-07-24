@@ -1,34 +1,35 @@
-#include "BlockFactory.h"
-#include "Block.h"
+
+#include "BlockChain.h"
+#include "Transaction.h"
+#include "SmartContract.h"
 #include "Logger.h"
 #include <iostream>
-#include <memory>
-#include "BlockChain.h"
+#include <vector>
+#include <map>
 
-
-
-
-int main(){
-    try{
+    int main() {
+    try {
         Logger::getInstance().log(" === New Test Session ===");
-    Logger::getInstance().log("Starting blockchain test");
+        Logger::getInstance().log("Starting blockchain test");
 
-    GeneralFactory &factory=getGeneralFactory();
-    Blockchain &blockchain=factory.createBlockchain(2);
-    blockchain.addBlock("First block data");
-    blockchain.addBlock("Second block data");
-    if (blockchain.isChainValid())
-    {
-        Logger::getInstance().log(" [INFO] Chain validation passed");
-    }
-    else
-    {
-        throw std::runtime_error("Chain is invalid"); }
-    }
+        Blockchain& bc = Blockchain::getInstance(4);
+        Transaction tx("Alice", "Bob", 10.5, "fake", "if balance[Alice] >= 10 then transfer 10 to Bob");
+        std::vector<Transaction> txs = {tx};
+        bc.addBlock(txs);
+        std::cout << bc.getChainInfo() << std::endl;
+        if (bc.isChainValid()) {
+            std::cout << "Chain is valid" << std::endl;
+        } else {
+            std::cout << "Chain is invalid" << std::endl;
+        }
 
-    catch(const std::exception &ex)
-    {
-        std::cout<<ex.what()<<"Eror"<<std::endl;
+        auto state = bc.getGlobalState();
+        std::cout << "Alice balance: " << state.at("Alice") << std::endl;
+        std::cout << "Bob balance: " << state.at("Bob") << std::endl;
+    } catch (const std::exception& ex) {
+        Logger::getInstance().log("Error: " + std::string(ex.what()));
+        std::cout << "Error: " << ex.what() << std::endl;
     }
     return 0;
 }
+

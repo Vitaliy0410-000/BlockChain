@@ -2,11 +2,10 @@
 #include <string>
 #include "Logger.h"
 #include <sstream>
-
-Transaction::Transaction(std::string sender,std::string recipient,double amount,std::string signature)
-    : sender(sender),recipient(recipient),amount(amount),signature(signature)
+#include <iomanip>
+Transaction::Transaction(const std::string& sender, const std::string& recipient, double amount,const std::string& signature,const std::string& contractCode)
+    : sender(sender), recipient(recipient), amount(amount), contractCode(contractCode), signature(signature)
 {
-
     if(sender.empty())
     {
         throw std::invalid_argument("the sender cannot be empty!");
@@ -17,7 +16,7 @@ Transaction::Transaction(std::string sender,std::string recipient,double amount,
     }
     if(amount<=0)
     {
-         throw std::invalid_argument("Amount must be positive!");
+        throw std::invalid_argument("Amount must be positive!");
     }
     if(signature.empty())
     {
@@ -25,32 +24,37 @@ Transaction::Transaction(std::string sender,std::string recipient,double amount,
     }
 }
 
-std::string Transaction::getSender()
+std::string Transaction::getSender() const
 {
     return sender;
 }
 
-std::string Transaction::getRecipient()
+std::string Transaction::getRecipient() const
 {
     return recipient;
 }
 
-double Transaction::getAmount()
+double Transaction::getAmount() const
 {
     return amount;
 }
 
-std::string Transaction::getSignature()
+std::string Transaction::getContractCode() const
 {
-    return signature;
+    return contractCode;
 }
 
 std::string Transaction::toString() const
 {
-    std::stringstream stringTransaction;
-    stringTransaction<<sender<< ":" <<recipient<< ":" <<amount<< ":" <<signature;
-    Logger::getInstance().log("Create Transaction: ""Sender:"+ std::string(sender)+
-                              " Recipient "+std::string(recipient)+ " Amount: "+ std::to_string(amount)+" Signature "+std::string(signature));
-    return stringTransaction.str();
+    std::stringstream ss;
+    ss << sender << ":" << recipient << ":" << std::fixed << std::setprecision(2) << amount << ":" << signature;
+    if (!contractCode.empty()) {
+        ss << ":contract{" << contractCode << "}";
+    }
+    return ss.str();
+}
 
+std::string Transaction::getSignature() const
+{
+    return signature;
 }

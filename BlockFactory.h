@@ -16,7 +16,7 @@ public:
 class RegularBlockFactory
 {
 public:
-    std::unique_ptr<Block> createRegularBlock(int index, long long timestamp, std::string data, std::string prevHash, int nonce) const;
+    std::unique_ptr<Block> createRegularBlock(int index, long long timestamp, std::vector<Transaction> transactions, std::string prevHash, int nonce) const;
 };
 
 class BlockChainFactory
@@ -39,7 +39,7 @@ private:
 public:
     static GeneralFactory& getInstance();
     std::unique_ptr<Block> createGenesis() const;
-    std::unique_ptr<Block> createRegularBlock(int index, long long timestamp, std::string data, std::string prevHash, int nonce) const;
+    std::unique_ptr<Block> createRegularBlock(int index, long long timestamp, std::vector<Transaction> transactions, std::string prevHash, int nonce) const;
     Blockchain& createBlockchain(int difficulty) const;
 };
 GeneralFactory& getGeneralFactory();

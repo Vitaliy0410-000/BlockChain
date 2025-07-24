@@ -8,7 +8,7 @@
 #include "RegularBlock.h"
 #include <mutex>
 #include <nlohmann/json.hpp>
-
+#include "Transaction.h"
 
 Blockchain::Blockchain(int difficulty)
 {
@@ -25,30 +25,36 @@ Blockchain::Blockchain(int difficulty)
     genesis->mineBlockParallel(difficulty, 4);
     chain.push_back(std::move(genesis));
     Logger::getInstance().log("Initialized Blockchain with Genesis block");
+    globalState["Alice"] = 100.0;
+    globalState["Bob"] = 50.0;
 }
+
 Blockchain* Blockchain::instance = nullptr;
 
- std::mutex Blockchain::instanceMutex;
+std::mutex Blockchain::instanceMutex;
 std::mutex Blockchain::chainMutex;
 
-
-void Blockchain::addBlock(std::string data)
+void Blockchain::addBlock(std::vector<Transaction> transactions)
 {
-    if (data.empty())
+    if (transactions.empty())
     {
-        throw std::invalid_argument("Data cannot be empty");
+        throw std::invalid_argument("Transactions list cannot be empty!");
     }
     Logger::getInstance().log("Chain size: " + std::to_string(chain.size()));
-    auto block = RegularBlockFactory().createRegularBlock(chain.size(), std::time(nullptr), data, chain.back()->getHash(), 0);
-    if(chain.empty())
-    {
-        throw std::runtime_error("Chain is empty, cannot add block");
-    }
+    auto block = RegularBlockFactory().createRegularBlock(chain.size(), std::time(nullptr), transactions, chain.back()->getHash(), 0);
     if (!block)
     {
         throw std::runtime_error("Failed to create RegularBlock");
     }
     block->mineBlockParallel(difficulty, 4);
+    for (const auto& tx : transactions) {
+        if (!tx.getContractCode().empty()) {
+            Logger::getInstance().log("Executing contract for transaction: " + tx.toString());
+            SmartContract contract(tx.getContractCode(), globalState);
+            contract.execute();
+            globalState = contract.getState();
+        }
+    }
     chain.push_back(std::move(block));
     Logger::getInstance().log("Added block with index=" + std::to_string(chain.size() - 1));
 }
@@ -72,15 +78,26 @@ bool Blockchain::isChainValid()
     return true;
 }
 
-std::string Blockchain::getChainInfo()const
-{
-     std::lock_guard<std::mutex>lock(chainMutex);
+std::string Blockchain::getChainInfo() const {
+    std::lock_guard<std::mutex> lock(chainMutex);
     nlohmann::json array = nlohmann::json::array();
-    for(const auto& block : chain)
-    {
+    for (const auto& block : chain) {
         nlohmann::json obj;
-        obj["index"]=block->getIndex();
-        obj["hash"]=block->getHash();
+        obj["index"] = block->getIndex();
+        obj["hash"] = block->getHash();
+        nlohmann::json txArray = nlohmann::json::array();
+        for (const auto& tx : block->getTransactions()) {
+            nlohmann::json txObj;
+            txObj["sender"] = tx.getSender();
+            txObj["recipient"] = tx.getRecipient();
+            txObj["amount"] = tx.getAmount();
+            txObj["signature"] = tx.getSignature();
+            if (!tx.getContractCode().empty()) {
+                txObj["contractCode"] = tx.getContractCode();
+            }
+            txArray.push_back(txObj);
+        }
+        obj["transactions"] = txArray;
         array.push_back(obj);
     }
     std::string result = array.dump(4);
@@ -90,10 +107,20 @@ std::string Blockchain::getChainInfo()const
 
 Blockchain& Blockchain::getInstance(int difficulty)
 {
-    if(instance == nullptr)
+    std::lock_guard<std::mutex> lock(instanceMutex);
+    if (instance == nullptr)
     {
-       instance = new Blockchain(difficulty);
+        instance = new Blockchain(difficulty);
     }
     Logger::getInstance().log("Blockchain getInstance called");
     return *instance;
+}
+
+Blockchain::~Blockchain() {
+    delete instance;
+    instance = nullptr;
+}
+
+const std::map<std::string, double>& Blockchain::getGlobalState() const {
+    return globalState;
 }

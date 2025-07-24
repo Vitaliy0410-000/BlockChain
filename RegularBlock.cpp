@@ -1,4 +1,3 @@
-#include "RegularBlock.h"
 #include "Logger.h"
 #include "openssl/sha.h"
 #include "iomanip"
@@ -7,20 +6,37 @@
 #include <thread>
 #include <atomic>
 #include <vector>
+#include "RegularBlock.h"
 
 
 
-
-RegularBlock::RegularBlock(int index,long long timestamp,std::string data,std::string prevHash,int nonce)
-:Block(index,timestamp,data,prevHash,nonce)
+RegularBlock::RegularBlock(int index,long long timestamp,std::vector<Transaction> transactions,std::string prevHash,int nonce)
+    :Block(index,timestamp,transactions,prevHash,nonce)
 {
+    if(transactions.empty())
+    {
+        throw std::invalid_argument ("I can't create a block. No transactions!");
+    }
     Logger::getInstance().log("Create Regular block with index="+std::to_string(index));
 };
 
-    std::string RegularBlock::calculateHash()const
+std::string RegularBlock::calculateHash()const
 {
+    std::string transactionsStr;
+    for(auto it= transactions.begin();it!=transactions.end();it++)
+    {
+        std::string currentTransactionString = it->toString();
+        if (!transactionsStr.empty())
+        {
+            transactionsStr += ";";
+        }
+        transactionsStr += currentTransactionString;
+    }
+
+
+
     std::stringstream ss;
-    ss<<index<< ":" <<timestamp<< ":" <<data<< ":" <<prevHash<< ":" <<nonce;
+    ss << index << ":" << timestamp << ":" << transactionsStr << ":" << prevHash << ":" << nonce;
     std::string blockData=ss.str();
     unsigned char hash[SHA256_DIGEST_LENGTH];
     SHA256_CTX sha256;
@@ -32,7 +48,8 @@ RegularBlock::RegularBlock(int index,long long timestamp,std::string data,std::s
     {
         ss_hex<<std::hex<<std::setw(2)<<std::setfill('0')<<(int)hash[i];
     }
-    std::string hashStr = ss_hex.str();
+    Logger::getInstance().log("Calculating hash for Regular block: " + blockData);
+
     return ss_hex.str();
 
 }
@@ -77,7 +94,10 @@ void RegularBlock::mineBlockParallel(int difficulty, int numThreads) {
 
     Logger::getInstance().log("Mined Regular block: nonce=" + std::to_string(this->nonce) + ", hash=" + this->hash);
 }
-
+const std::vector<Transaction>& RegularBlock::getTransactions() const
+{
+    return transactions;
+}
 
 
 int RegularBlock::getIndex()const
@@ -87,6 +107,9 @@ int RegularBlock::getIndex()const
 std::string RegularBlock::getHash()const
 {
     return hash;
+}
+std::string RegularBlock::getPrevHash() const {
+    return prevHash;
 }
 
 void RegularBlock::mineBlock(int difficulty) {

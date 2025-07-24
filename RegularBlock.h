@@ -12,13 +12,15 @@ class RegularBlock:public Block
 {
     friend class RegularBlockFactory;
 public:
-    RegularBlock(int index,long long timestamp,std::string data,std::string prevHash,int nonce);
+    RegularBlock(int index,long long timestamp,std::vector<Transaction> transactions,std::string prevHash,int nonce);
 
     std::string calculateHash() const override;
     void mineBlockParallel(int difficulty, int numThreads) override;
     void mineBlock(int difficulty)override;
     int getIndex() const override;
     std::string getHash()const override;
+    const std::vector<Transaction>& getTransactions() const override;
+    std::string getPrevHash() const override;
 };
 
 #endif // REGULARBLOCK_H

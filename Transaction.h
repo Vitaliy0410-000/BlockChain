@@ -7,14 +7,15 @@ private:
     std::string sender;//отправитель
     std::string recipient;//получатель
     double amount;
+    std::string contractCode;
     std::string signature;//подпись пока заглушка
 public:
-    std::string getSender();
-    std::string getRecipient();
-    double getAmount();
-    std::string getSignature();
-    Transaction(std::string sender,std::string recipient,double amount,std::string signature);
+    std::string getSender()const;
+    std::string getRecipient()const;
+    double getAmount()const;
+    std::string getSignature()const;
+   Transaction(const std::string& sender, const std::string& recipient, double amount, const std::string& signature, const std::string& contractCode = "");
     std::string toString()const;
+    std::string getContractCode() const;
 };
-
-#endif // TRANSACTION_H
+#endif

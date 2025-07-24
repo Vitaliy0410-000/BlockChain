@@ -1,4 +1,3 @@
-#include "BlockChain.h"
 #include "Block.h"
 #include "Logger.h"
 #include "RegularBlock.h"
@@ -10,14 +9,14 @@
 std::unique_ptr<Block> GenesisFactory::createGenesis() const
 {
     Logger::getInstance().log("Created block type: GENESIS BLOCK");
-    return std::unique_ptr<Block>(new Genesis(0, std::time(nullptr), "Genesis Block", "0", 0));
+    return std::unique_ptr<Block>(new Genesis(0, std::time(nullptr), std::vector<Transaction>{}, "0", 0));
 }
 
 // Реализация RegularBlockFactory
-std::unique_ptr<Block> RegularBlockFactory::createRegularBlock(int index, long long timestamp, std::string data, std::string prevHash, int nonce) const
+std::unique_ptr<Block> RegularBlockFactory::createRegularBlock(int index, long long timestamp, std::vector<Transaction> transactions, std::string prevHash, int nonce) const
 {
     Logger::getInstance().log("Created block type: REGULAR BLOCK");
-    return std::unique_ptr<Block>(new RegularBlock(index, timestamp, data, prevHash, nonce));
+    return std::unique_ptr<Block>(new RegularBlock(index, timestamp, transactions, prevHash, nonce));
 }
 
 // Реализация BlockChainFactory
@@ -47,9 +46,9 @@ std::unique_ptr<Block> GeneralFactory::createGenesis() const
     return genesisFactory.createGenesis();
 }
 
-std::unique_ptr<Block> GeneralFactory::createRegularBlock(int index, long long timestamp, std::string data, std::string prevHash, int nonce) const
+std::unique_ptr<Block> GeneralFactory::createRegularBlock(int index, long long timestamp, std::vector<Transaction> transactions, std::string prevHash, int nonce) const
 {
-    return regularBlockFactory.createRegularBlock(index, timestamp, data, prevHash, nonce);
+    return regularBlockFactory.createRegularBlock(index, timestamp, transactions, prevHash, nonce);
 }
 
 Blockchain& GeneralFactory::createBlockchain(int difficulty) const
@@ -61,4 +60,3 @@ Blockchain& GeneralFactory::createBlockchain(int difficulty) const
 GeneralFactory& getGeneralFactory() {
     return GeneralFactory::getInstance();
 }
-
