@@ -65,7 +65,7 @@ private:
         int64_t balance;
         int64_t time;
         int blockNum;
-    };
+    }context;
     std::vector<std::string>log;//Зачем: Хранит события от EMIT (например, "Transfer:Alice:Bob:100").
     int64_t gasUsed;//Отслеживает, сколько газа потрачено на выполнение opcodes.
     int64_t gasLimit;//Зачем: Максимальный газ для транзакции, берётся из Transaction::gasLimit.
@@ -73,6 +73,7 @@ private:
     std::vector<uint8_t>& bytecode;//Зачем: Ссылка на байт-код контракта из Transaction::contractCode
     std::map<std::string, int64_t> storageCopy;//Зачем: Копия storage для отката при ошибке.
 public:
+    friend void read_bytes_as_type();
     Virtual_Machine(std::vector<uint8_t>& bytecode, std::map<std::string, int64_t>& storage, Context context, int64_t gasLimit);
     bool execute();
     //Зачем: Выполняет байт-код контракта.
@@ -83,7 +84,7 @@ public:
     void pushValue(Value);//Зачем: Добавляет значение (int64_t или std::string) в stack_memory.
     Value popValue();//Зачем: Извлекает и возвращает верхнее значение из stack_memory.
     void executeOpcode(uint8_t);//Зачем: Выполняет один opcode (PUSH, ADD, SLOAD, SSTORE, EMIT, JUMPI).
-
+    std::string read_string(uint32_t length);//вспомогательная функция для чтения строк
 
 
 };
