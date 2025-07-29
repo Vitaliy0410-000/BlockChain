@@ -17,6 +17,7 @@ add_executable(testChain main.cpp
     Transaction.h Transaction.cpp
     Blockk.cpp
     SmartContract.h SmartContract.cpp
+    Virtual_Machine.h Virtual_Machine.cpp
 )
 
 find_package(nlohmann_json 3.12.0 REQUIRED)

@@ -112,13 +112,16 @@ Blockchain& Blockchain::getInstance(int difficulty)
     {
         instance = new Blockchain(difficulty);
     }
+    else if (instance->difficulty != difficulty)
+    {
+        Logger::getInstance().log("Warning: Blockchain instance already exists with different difficulty");
+    }
     Logger::getInstance().log("Blockchain getInstance called");
     return *instance;
 }
 
 Blockchain::~Blockchain() {
-    delete instance;
-    instance = nullptr;
+    chain.clear();
 }
 
 const std::map<std::string, double>& Blockchain::getGlobalState() const {

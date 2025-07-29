@@ -12,13 +12,12 @@
 #include <thread>
 #include <map>
 
-    class Blockchain
+class Blockchain
 {
 public:
     static std::mutex instanceMutex;
     static std::mutex chainMutex;
     static Blockchain& getInstance(int difficulty = 2);
-
     void addBlock(std::vector<Transaction> transactions);
     bool isChainValid();
     std::string getChainInfo() const;
@@ -36,4 +35,3 @@ private:
 };
 
 #endif
-

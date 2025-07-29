@@ -48,7 +48,7 @@ std::string RegularBlock::calculateHash()const
     {
         ss_hex<<std::hex<<std::setw(2)<<std::setfill('0')<<(int)hash[i];
     }
-    Logger::getInstance().log("Calculating hash for Regular block: " + blockData);
+
 
     return ss_hex.str();
 
