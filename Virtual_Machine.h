@@ -4,23 +4,39 @@
 #include <string>
 #include <map>
 #include <cstdint>
+#include <stdexcept>
+
+
+class MyException: public std::exception{
+private:
+    std::string message;
+public:
+    MyException(const std::string& msg);
+    const char* what() const noexcept override;
+};
+
+enum class Opcode : uint8_t {
+    HALT = 0x00, PUSH = 0x01, POP = 0x02, ADD = 0x03, SUB = 0x04,
+    MUL = 0x05, DIV = 0x06, EQ = 0x07, JUMP = 0x08, JZ = 0x09,
+    JNZ = 0x0A, SLOAD = 0x0B, SSTORE = 0x0C, CALL = 0x0D, RET = 0x0E,
+    DUP = 0x0F, SWAP = 0x10, GT = 0x11, LT = 0x12, GTE = 0x13,
+    LTE = 0x14, EMIT = 0x15, TIME = 0x16, BLOCKNUM = 0x17, BALANCE = 0x18,
+    SENDER = 0x19, TXVALUE = 0x1A, ASSERT = 0x1B, LABEL = 0x1C
+};
 
 class Virtual_Machine
 {
 private:
-    union Value {
-        int64_t num;
-        std::string str;
-        bool isString;
+    struct Value {
+        bool isString;  // ✅ Переносим сюда
 
-        Value(bool isString = false) : isString(isString) {
-            if (isString) new (&str) std::string();
-            else num = 0;
-        }
+        union {
+            int64_t num;
+            std::string str;
+        };
 
-        ~Value() {
-            if (isString) str.~basic_string();
-        }
+        Value(int64_t n) : isString(false), num(n) {}
+        Value(const std::string& s) : isString(true) { new (&str) std::string(s); }
 
         Value(const Value& other) : isString(other.isString) {
             if (isString) new (&str) std::string(other.str);
@@ -30,6 +46,10 @@ private:
         Value(Value&& other) noexcept : isString(other.isString) {
             if (isString) new (&str) std::string(std::move(other.str));
             else num = other.num;
+        }
+
+        ~Value() {
+            if (isString) str.~basic_string();
         }
 
         Value& operator=(const Value& other) {
@@ -53,11 +73,12 @@ private:
         }
     };
     //Зачем: Хранит значение в стеке (stack_memory), которое может быть числом (int64_t) или строкой (std::string) — например, 100 или "Alice".
-   // Роль: Поддерживает типы данных для PUSH, SLOAD, SENDER (строки для адресов/ключей, числа для балансов).
+    // Роль: Поддерживает типы данных для PUSH, SLOAD, SENDER (строки для адресов/ключей, числа для балансов).
     // isString указывает, активно ли поле str или num.
-    std::vector<union Value>stack_memory;//Стек для временных вычислений (например, для PUSH, ADD, SLOAD)
+    std::vector< Value>stack_memory;//Стек для временных вычислений (например, для PUSH, ADD, SLOAD)
     std::map<std::string, int64_t>&storage;//Зачем: Ссылка на globalState блокчейна, хранит постоянные данные контрактов (например, "balance[Alice]": 100).
     //Роль: Используется для SLOAD (чтение) и SSTORE (запись).
+    std::vector<size_t> callStack;
     struct Context//Зачем: Хранит контекст транзакции.
     {
         std::string sender;
@@ -73,8 +94,11 @@ private:
     std::vector<uint8_t>& bytecode;//Зачем: Ссылка на байт-код контракта из Transaction::contractCode
     std::map<std::string, int64_t> storageCopy;//Зачем: Копия storage для отката при ошибке.
 public:
-    friend void read_bytes_as_type();
-    Virtual_Machine(std::vector<uint8_t>& bytecode, std::map<std::string, int64_t>& storage, Context context, int64_t gasLimit);
+    template<typename T>
+    T read_bytes_as_type();
+    Virtual_Machine(std::vector<uint8_t>& bytecode,
+                                     std::map<std::string, int64_t>& storage,
+                    Context context,std::vector<size_t> callStack,int64_t gasLimit);
     bool execute();
     //Зачем: Выполняет байт-код контракта.
     //Роль:Читает bytecode[programCounter], вызывает executeOpcode для каждого opcode.
