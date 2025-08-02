@@ -1,0 +1,56 @@
+ [2025-08-02 12:13:44]  === New Test Session ===
+ [2025-08-02 12:13:44] Starting blockchain test
+ [2025-08-02 12:13:44] Created block type: GENESIS BLOCK
+ [2025-08-02 12:13:44] Create Genesis block with index=0
+ [2025-08-02 12:13:44] Started mining Genesis block in 4 threads
+ [2025-08-02 12:13:44] Mined Genesis block: nonce=39892, hash=0000346cd09643bfaf1233e891e1fd38faad7d1998551ca8d1de0d5f3e09a0ce
+ [2025-08-02 12:13:44] Initialized Blockchain with Genesis block
+ [2025-08-02 12:13:44] Blockchain getInstance called
+ [2025-08-02 12:13:44] Chain size: 1
+ [2025-08-02 12:13:44] Created block type: REGULAR BLOCK
+ [2025-08-02 12:13:44] Create Regular block with index=1
+ [2025-08-02 12:13:44] Started mining Regular block in 4 threads
+ [2025-08-02 12:13:44] Mined Regular block: nonce=52077, hash=0000c6b705197d0a5a932a988c24d60a6efd5c62afc61b25ff17a3f85078f408
+ [2025-08-02 12:13:44] Executing contract for transaction: Alice:Bob:10.50:fake:contract{01 00 00 00 00 00 00 00 64 00}
+ [2025-08-02 12:13:44] Added block with index=1
+ [2025-08-02 12:13:44] getChainInfo: chain size = 2
+ [2025-08-02 12:13:44] Processing block with index=0
+ [2025-08-02 12:13:44] Block has 0 transactions
+ [2025-08-02 12:13:44] Processing block with index=1
+ [2025-08-02 12:13:44] Block has 1 transactions
+ [2025-08-02 12:13:44] Chain info: [
+    {
+        "hash": "0000346cd09643bfaf1233e891e1fd38faad7d1998551ca8d1de0d5f3e09a0ce",
+        "index": 0,
+        "transactions": []
+    },
+    {
+        "hash": "0000c6b705197d0a5a932a988c24d60a6efd5c62afc61b25ff17a3f85078f408",
+        "index": 1,
+        "transactions": [
+            {
+                "amount": 10.5,
+                "contractCode": "01 00 00 00 00 00 00 00 64 00",
+                "recipient": "Bob",
+                "sender": "Alice",
+                "signature": "fake"
+            }
+        ]
+    }
+]
+ [2025-08-02 12:13:44] Validating chain with size: 2
+ [2025-08-02 12:13:44] Chain is valid
+ [2025-08-02 12:13:44] Running testBlockchain
+ [2025-08-02 12:13:44] Chain size: 2
+ [2025-08-02 12:13:44] Created block type: REGULAR BLOCK
+ [2025-08-02 12:13:44] Create Regular block with index=2
+ [2025-08-02 12:13:44] Started mining Regular block in 4 threads
+ [2025-08-02 12:13:45] Mined Regular block: nonce=233542, hash=000045018faab59deecf1f94ae666253d15a1405cf95dbdf4d72207427979494
+ [2025-08-02 12:13:45] Executing contract for transaction: Alice:Bob:10.00:sig1:contract{01 00 00 00 00 00 00 00 64 00}
+ [2025-08-02 12:13:45] Executing contract for transaction: Bob:Alice:20.00:sig2:contract{01 01 00 00 00 05 41 6c 69 63 65 01 00 00 00 00 00 00 00 64 0c 00}
+ [2025-08-02 12:13:45] Executing contract for transaction: Alice:Bob:15.00:sig3:contract{01 01 00 00 00 08 54 72 61 6e 73 66 65 72 15 00}
+ [2025-08-02 12:13:45] Event: Event:Transfer
+ [2025-08-02 12:13:45] Executing contract for transaction: Bob:Alice:5.00:sig4:contract{02}
+ [2025-08-02 12:13:45] Contract execution failed for transaction: Bob:Alice:5.00:sig4:contract{02}
+ [2025-08-02 12:13:45] Added block with index=2
+ [2025-08-02 12:13:45] GlobalState after tests: Alice=100, Bob=50

@@ -79,6 +79,14 @@ private:
     std::map<std::string, int64_t>&storage;//Зачем: Ссылка на globalState блокчейна, хранит постоянные данные контрактов (например, "balance[Alice]": 100).
     //Роль: Используется для SLOAD (чтение) и SSTORE (запись).
     std::vector<size_t> callStack;
+    std::vector<std::string>log;//Зачем: Хранит события от EMIT (например, "Transfer:Alice:Bob:100").
+    int64_t gasUsed;//Отслеживает, сколько газа потрачено на выполнение opcodes.
+    int64_t gasLimit;//Зачем: Максимальный газ для транзакции, берётся из Transaction::gasLimit.
+    size_t programCounter;//Зачем: Указывает на текущий байт в bytecode (индекс)
+    std::vector<uint8_t> bytecode;//Зачем: Ссылка на байт-код контракта из Transaction::contractCode
+    std::map<std::string, int64_t> storageCopy;//Зачем: Копия storage для отката при ошибке.
+public:
+    std::vector<std::string>& getLog();
     struct Context//Зачем: Хранит контекст транзакции.
     {
         std::string sender;
@@ -87,16 +95,9 @@ private:
         int64_t time;
         int blockNum;
     }context;
-    std::vector<std::string>log;//Зачем: Хранит события от EMIT (например, "Transfer:Alice:Bob:100").
-    int64_t gasUsed;//Отслеживает, сколько газа потрачено на выполнение opcodes.
-    int64_t gasLimit;//Зачем: Максимальный газ для транзакции, берётся из Transaction::gasLimit.
-    size_t programCounter;//Зачем: Указывает на текущий байт в bytecode (индекс)
-    std::vector<uint8_t>& bytecode;//Зачем: Ссылка на байт-код контракта из Transaction::contractCode
-    std::map<std::string, int64_t> storageCopy;//Зачем: Копия storage для отката при ошибке.
-public:
     template<typename T>
     T read_bytes_as_type();
-    Virtual_Machine(std::vector<uint8_t>& bytecode,
+    Virtual_Machine(const std::vector<uint8_t>& bytecode,
                                      std::map<std::string, int64_t>& storage,
                     Context context,std::vector<size_t> callStack,int64_t gasLimit);
     bool execute();

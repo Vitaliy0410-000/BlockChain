@@ -31,11 +31,7 @@
 
 
 #include "Virtual_Machine.h"
-#include <vector>
-#include <string>
-#include <map>
-#include <cstdint>
-#include <stdexcept>
+
 
 MyException::MyException(const std::string& msg)
     : message(msg) {};
@@ -46,25 +42,59 @@ const char* MyException::what() const noexcept
 
 
 
-Virtual_Machine::Virtual_Machine(std::vector<uint8_t>& bytecode,
+Virtual_Machine::Virtual_Machine(const std::vector<uint8_t>& bytecode,
     std::map<std::string, int64_t>& storage,
                                  Context context,std::vector<size_t> callStack,int64_t gasLimit)
     : bytecode(bytecode), storage(storage), context(context),callStack(callStack) ,gasLimit(gasLimit),
     gasUsed(0), programCounter(0), storageCopy(storage)
 {
     if (bytecode.size() == 0) {
-        throw std::runtime_error("Empty bytecode");
+        throw MyException("Empty bytecode");
     }
 }
 
 bool  Virtual_Machine::execute()
 {
+    try
+    {
     while(programCounter < bytecode.size())
     {
-
+        if(gasUsed > gasLimit)
+        {
+            revert();
+            return false;
+        }
+        uint8_t opcode;
+        opcode = bytecode.at(programCounter);
+        programCounter++;
+        executeOpcode(opcode);
+    }
+    return true;
+    }
+    catch (const MyException& e)
+    {
+        return false;
     }
 }
 
+
+void Virtual_Machine::revert()
+{
+    stack_memory.clear();
+    log.clear();
+    callStack.clear();
+    storage = storageCopy;
+    gasUsed=0;
+    programCounter=0;
+}//Зачем: Откатывает изменения при ошибке.
+void Virtual_Machine::pushValue(Virtual_Machine::Value val)
+{
+    if(stack_memory.size()>=1000)
+    {
+        throw MyException("Stack overflow");
+    }
+  stack_memory.push_back(val);
+}
 
 
 //используется big-endian (старший байт первый)
@@ -73,7 +103,7 @@ T Virtual_Machine::read_bytes_as_type()
 {
     if (programCounter + sizeof(T) > bytecode.size())
     {
-        throw std::runtime_error("Attempt to read past end of bytecode (read_bytes_as_type).");
+        throw MyException("Attempt to read past end of bytecode (read_bytes_as_type).");
     }
     T value = 0;
     for (size_t i = 0; i < sizeof(T); ++i)
@@ -83,6 +113,7 @@ T Virtual_Machine::read_bytes_as_type()
     programCounter += sizeof(T);
     return value;
 }
+
 std::string Virtual_Machine::read_string(uint32_t length) {
     if (programCounter + length > bytecode.size())
     {
@@ -108,9 +139,11 @@ Virtual_Machine::Value Virtual_Machine::popValue()
 }
 
 
-void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
+void Virtual_Machine::executeOpcode(uint8_t opcodeValue)
+{
     Opcode opcode = static_cast<Opcode>(opcodeValue);
-    switch (opcode) {
+    switch (opcode)
+    {
     case Opcode::HALT:
         gasUsed += 0;
         programCounter = bytecode.size();
@@ -118,22 +151,27 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::PUSH:
         gasUsed += 3;
-        if (programCounter >= bytecode.size()) {
+        if (programCounter >= bytecode.size())
+        {
             throw MyException("Attempt to read past end of bytecode (PUSH type byte missing)");
         }
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         {
             uint8_t type = bytecode[programCounter++];
-            if (type == 0) {
+            if (type == 0)
+            {
                 int64_t num_val = read_bytes_as_type<int64_t>();
                 pushValue(Value(num_val));
-            } else if (type == 1) {
+            } else if (type == 1)
+            {
                 uint32_t string_length = read_bytes_as_type<uint32_t>();
                 std::string str_val = read_string(string_length);
                 pushValue(Value(str_val));
-            } else {
+            } else
+            {
                 throw MyException("Unknown PUSH type: " + std::to_string(type));
             }
         }
@@ -146,16 +184,19 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::ADD:
         gasUsed += 3;
-        if (stack_memory.size() < 2) {
+        if (stack_memory.size() < 2)
+        {
             throw MyException("Stack underflow");
         }
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         {
             Value b = popValue();
             Value a = popValue();
-            if (a.isString || b.isString) {
+            if (a.isString || b.isString)
+            {
                 throw MyException("Invalid type for ADD: expected numbers");
             }
             pushValue(Value(a.num + b.num));
@@ -164,16 +205,19 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::SUB:
         gasUsed += 3;
-        if (stack_memory.size() < 2) {
+        if (stack_memory.size() < 2)
+        {
             throw MyException("Stack underflow");
         }
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         {
             Value b = popValue();
             Value a = popValue();
-            if (a.isString || b.isString) {
+            if (a.isString || b.isString)
+            {
                 throw MyException("Invalid type for SUB: expected numbers");
             }
             pushValue(Value(a.num - b.num));
@@ -182,16 +226,19 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::MUL:
         gasUsed += 6;
-        if (stack_memory.size() < 2) {
+        if (stack_memory.size() < 2)
+        {
             throw MyException("Stack underflow");
         }
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         {
             Value b = popValue();
             Value a = popValue();
-            if (a.isString || b.isString) {
+            if (a.isString || b.isString)
+            {
                 throw MyException("Invalid type for MUL: expected numbers");
             }
             pushValue(Value(a.num * b.num));
@@ -200,19 +247,23 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::DIV:
         gasUsed += 6;
-        if (stack_memory.size() < 2) {
+        if (stack_memory.size() < 2)
+        {
             throw MyException("Stack underflow");
         }
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         {
             Value b = popValue();
             Value a = popValue();
-            if (a.isString || b.isString) {
+            if (a.isString || b.isString)
+            {
                 throw MyException("Invalid type for DIV: expected numbers");
             }
-            if (b.num == 0) {
+            if (b.num == 0)
+            {
                 throw MyException("Division by zero");
             }
             pushValue(Value(a.num / b.num));
@@ -221,21 +272,26 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::EQ:
         gasUsed += 3;
-        if (stack_memory.size() < 2) {
+        if (stack_memory.size() < 2)
+        {
             throw MyException("Stack underflow");
         }
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         {
             Value b = popValue();
             Value a = popValue();
-            if (a.isString != b.isString) {
+            if (a.isString != b.isString)
+            {
                 throw MyException("Invalid type for EQ: mismatched types");
             }
-            if (a.isString) {
+            if (a.isString)
+            {
                 pushValue(Value(a.str == b.str ? 1 : 0));
-            } else {
+            } else
+            {
                 pushValue(Value(a.num == b.num ? 1 : 0));
             }
         }
@@ -245,7 +301,8 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
         gasUsed += 10;
         {
             int64_t offset = read_bytes_as_type<int64_t>();
-            if (offset < 0 || static_cast<size_t>(offset) >= bytecode.size()) {
+            if (offset < 0 || static_cast<size_t>(offset) >= bytecode.size())
+            {
                 throw MyException("Invalid JUMP offset");
             }
             programCounter = static_cast<size_t>(offset);
@@ -254,19 +311,23 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::JZ:
         gasUsed += 10;
-        if (stack_memory.empty()) {
+        if (stack_memory.empty())
+        {
             throw MyException("Stack underflow");
         }
         {
             Value cond = popValue();
-            if (cond.isString) {
+            if (cond.isString)
+            {
                 throw MyException("Invalid type for JZ: expected number");
             }
             int64_t offset = read_bytes_as_type<int64_t>();
-            if (offset < 0 || static_cast<size_t>(offset) >= bytecode.size()) {
+            if (offset < 0 || static_cast<size_t>(offset) >= bytecode.size())
+            {
                 throw MyException("Invalid JZ offset");
             }
-            if (cond.num == 0) {
+            if (cond.num == 0)
+            {
                 programCounter = static_cast<size_t>(offset);
             }
         }
@@ -274,19 +335,23 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::JNZ:
         gasUsed += 10;
-        if (stack_memory.empty()) {
+        if (stack_memory.empty())
+        {
             throw MyException("Stack underflow");
         }
         {
             Value cond = popValue();
-            if (cond.isString) {
+            if (cond.isString)
+            {
                 throw MyException("Invalid type for JNZ: expected number");
             }
             int64_t offset = read_bytes_as_type<int64_t>();
-            if (offset < 0 || static_cast<size_t>(offset) >= bytecode.size()) {
+            if (offset < 0 || static_cast<size_t>(offset) >= bytecode.size())
+            {
                 throw MyException("Invalid JNZ offset");
             }
-            if (cond.num != 0) {
+            if (cond.num != 0)
+            {
                 programCounter = static_cast<size_t>(offset);
             }
         }
@@ -294,21 +359,26 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::SLOAD:
         gasUsed += 20;
-        if (stack_memory.empty()) {
+        if (stack_memory.empty())
+        {
             throw MyException("Stack underflow");
         }
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         {
             Value key = popValue();
-            if (!key.isString) {
+            if (!key.isString)
+            {
                 throw MyException("Invalid type for SLOAD: expected string key");
             }
             auto it = storage.find(key.str);
-            if (it == storage.end()) {
+            if (it == storage.end())
+            {
                 pushValue(Value(0));
-            } else {
+            } else
+            {
                 pushValue(Value(it->second));
             }
         }
@@ -316,16 +386,19 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::SSTORE:
         gasUsed += 20;
-        if (stack_memory.size() < 2) {
+        if (stack_memory.size() < 2)
+        {
             throw MyException("Stack underflow");
         }
         {
             Value value = popValue();
             Value key = popValue();
-            if (!key.isString) {
+            if (!key.isString)
+            {
                 throw MyException("Invalid type for SSTORE: expected string key");
             }
-            if (value.isString) {
+            if (value.isString)
+            {
                 throw MyException("Invalid type for SSTORE: expected number value");
             }
             storage[key.str] = value.num;
@@ -336,7 +409,8 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
         gasUsed += 15;
         {
             int64_t offset = read_bytes_as_type<int64_t>();
-            if (offset < 0 || static_cast<size_t>(offset) >= bytecode.size()) {
+            if (offset < 0 || static_cast<size_t>(offset) >= bytecode.size())
+            {
                 throw MyException("Invalid CALL offset");
             }
             callStack.push_back(programCounter);
@@ -346,7 +420,8 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::RET:
         gasUsed += 3;
-        if (callStack.empty()) {
+        if (callStack.empty())
+        {
             throw MyException("Call stack underflow");
         }
         programCounter = callStack.back();
@@ -355,10 +430,12 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::DUP:
         gasUsed += 3;
-        if (stack_memory.empty()) {
+        if (stack_memory.empty())
+        {
             throw MyException("Stack underflow");
         }
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         pushValue(stack_memory.back());
@@ -366,7 +443,8 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::SWAP:
         gasUsed += 3;
-        if (stack_memory.size() < 2) {
+        if (stack_memory.size() < 2)
+        {
             throw MyException("Stack underflow");
         }
         {
@@ -379,16 +457,19 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::GT:
         gasUsed += 3;
-        if (stack_memory.size() < 2) {
+        if (stack_memory.size() < 2)
+        {
             throw MyException("Stack underflow");
         }
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         {
             Value b = popValue();
             Value a = popValue();
-            if (a.isString || b.isString) {
+            if (a.isString || b.isString)
+            {
                 throw MyException("Invalid type for GT: expected numbers");
             }
             pushValue(Value(a.num > b.num ? 1 : 0));
@@ -397,16 +478,19 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::LT:
         gasUsed += 3;
-        if (stack_memory.size() < 2) {
+        if (stack_memory.size() < 2)
+        {
             throw MyException("Stack underflow");
         }
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         {
             Value b = popValue();
             Value a = popValue();
-            if (a.isString || b.isString) {
+            if (a.isString || b.isString)
+            {
                 throw MyException("Invalid type for LT: expected numbers");
             }
             pushValue(Value(a.num < b.num ? 1 : 0));
@@ -415,16 +499,19 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::GTE:
         gasUsed += 3;
-        if (stack_memory.size() < 2) {
+        if (stack_memory.size() < 2)
+        {
             throw MyException("Stack underflow");
         }
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         {
             Value b = popValue();
             Value a = popValue();
-            if (a.isString || b.isString) {
+            if (a.isString || b.isString)
+            {
                 throw MyException("Invalid type for GTE: expected numbers");
             }
             pushValue(Value(a.num >= b.num ? 1 : 0));
@@ -433,16 +520,19 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::LTE:
         gasUsed += 3;
-        if (stack_memory.size() < 2) {
+        if (stack_memory.size() < 2)
+        {
             throw MyException("Stack underflow");
         }
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         {
             Value b = popValue();
             Value a = popValue();
-            if (a.isString || b.isString) {
+            if (a.isString || b.isString)
+            {
                 throw MyException("Invalid type for LTE: expected numbers");
             }
             pushValue(Value(a.num <= b.num ? 1 : 0));
@@ -451,12 +541,14 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::EMIT:
         gasUsed += 50;
-        if (stack_memory.empty()) {
+        if (stack_memory.empty())
+        {
             throw MyException("Stack underflow");
         }
         {
             Value event = popValue();
-            if (!event.isString) {
+            if (!event.isString)
+            {
                 throw MyException("Invalid type for EMIT: expected string");
             }
             log.push_back("Event:" + event.str);
@@ -465,7 +557,8 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::TIME:
         gasUsed += 5;
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         pushValue(Value(context.time));
@@ -473,7 +566,8 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::BLOCKNUM:
         gasUsed += 5;
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         pushValue(Value(context.blockNum));
@@ -481,7 +575,8 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::BALANCE:
         gasUsed += 5;
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         pushValue(Value(context.balance));
@@ -489,7 +584,8 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::SENDER:
         gasUsed += 5;
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         pushValue(Value(context.sender));
@@ -497,7 +593,8 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::TXVALUE:
         gasUsed += 5;
-        if (stack_memory.size() >= 1000) {
+        if (stack_memory.size() >= 1000)
+        {
             throw MyException("Stack overflow");
         }
         pushValue(Value(context.txValue));
@@ -505,15 +602,18 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
 
     case Opcode::ASSERT:
         gasUsed += 5;
-        if (stack_memory.empty()) {
+        if (stack_memory.empty())
+        {
             throw MyException("Stack underflow");
         }
         {
             Value cond = popValue();
-            if (cond.isString) {
+            if (cond.isString)
+            {
                 throw MyException("Invalid type for ASSERT: expected number");
             }
-            if (cond.num == 0) {
+            if (cond.num == 0)
+            {
                 throw MyException("Assertion failed");
             }
         }
@@ -526,4 +626,9 @@ void Virtual_Machine::executeOpcode(uint8_t opcodeValue) {
     default:
         throw MyException("Unknown opcode: " + std::to_string(opcodeValue));
     }
+}
+
+std::vector<std::string>& Virtual_Machine::getLog()
+{
+    return log;
 }

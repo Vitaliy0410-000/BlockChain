@@ -11,7 +11,7 @@
 #include <mutex>
 #include <thread>
 #include <map>
-
+#include <cstdint>
 class Blockchain
 {
 public:
@@ -21,8 +21,8 @@ public:
     void addBlock(std::vector<Transaction> transactions);
     bool isChainValid();
     std::string getChainInfo() const;
-    const std::map<std::string, double>& getGlobalState() const;
-
+    const std::map<std::string, int64_t>& getGlobalState() const;
+    void testBlockchain();
 private:
     Blockchain(int difficulty);
     Blockchain(const Blockchain&) = delete;
@@ -30,7 +30,7 @@ private:
     static Blockchain* instance;
     std::vector<std::unique_ptr<Block>> chain;
     int difficulty;
-    std::map<std::string, double> globalState;
+  std::map<std::string, int64_t> globalState;
     ~Blockchain();
 };
 
