@@ -1,76 +1,67 @@
 #include "Transaction.h"
-#include <string>
-#include "Logger.h"
+#include <stdexcept>
 #include <sstream>
-#include <iomanip>
 
-
-Transaction::Transaction(const std::string& sender, const std::string& recipient, double amount,
-                         const std::string& signature,const std::vector<uint8_t> contractCode, int64_t gasLimit)
-    : sender(sender), recipient(recipient), amount(amount), contractCode(contractCode), signature(signature),gasLimit(gasLimit)
+Transaction::Transaction(std::string sender, std::string recipient, double amount,
+                         std::string signature, std::vector<uint8_t> contractCode,
+                         int64_t gasLimit, std::string gltchCode)
+    : sender(sender), recipient(recipient), amount(amount), signature(signature),
+    contractCode(contractCode), gasLimit(gasLimit), gltchCode(gltchCode)
 {
-    if(sender.empty())
-    {
-        throw std::invalid_argument("the sender cannot be empty!");
-    }
-    if(recipient.empty())
-    {
-        throw std::invalid_argument("the recipient cannot be empty!");
-    }
-    if(amount<=0)
-    {
+    if (sender.empty())
+        throw std::invalid_argument("Sender cannot be empty!");
+    if (recipient.empty())
+        throw std::invalid_argument("Recipient cannot be empty!");
+    if (amount <= 0)
         throw std::invalid_argument("Amount must be positive!");
-    }
-    if(signature.empty())
-    {
-        throw std::invalid_argument("the signature cannot be empty!");
-    }
+    if (signature.empty())
+        throw std::invalid_argument("Signature cannot be empty!");
     if (gasLimit <= 0)
-    {
         throw std::invalid_argument("Gas limit must be positive!");
-    }
+}
+
+Transaction::Transaction(std::string sender, std::string recipient, double amount,
+                         std::string signature, std::vector<uint8_t> contractCode,
+                         int64_t gasLimit)
+    : Transaction(sender, recipient, amount, signature, contractCode, gasLimit, "")
+{
+    // Делегируем вызов конструктору с gltchCode, передавая пустую строку
 }
 
 std::string Transaction::getSender() const
 {
     return sender;
 }
-
 std::string Transaction::getRecipient() const
 {
     return recipient;
 }
-
 double Transaction::getAmount() const
 {
     return amount;
 }
-
- const std::vector<uint8_t>& Transaction::getContractCode() const
+std::string Transaction::getSignature() const
+{
+    return signature;
+}
+std::vector<uint8_t> Transaction::getContractCode() const
 {
     return contractCode;
+}
+int64_t Transaction::getGasLimit() const
+{
+    return gasLimit;
+}
+std::string Transaction::getGltchCode() const
+{
+    return gltchCode;
 }
 
 std::string Transaction::toString() const
 {
     std::stringstream ss;
-    ss << sender << ":" << recipient << ":" << std::fixed << std::setprecision(2) << amount << ":" << signature;
-    if (!contractCode.empty()) {
-        ss << ":contract{";
-        for (size_t i = 0; i < contractCode.size(); ++i) {
-            ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(contractCode[i]);
-            if (i < contractCode.size() - 1) ss << " ";
-        }
-        ss << "}";
-    }
+    ss << "Transaction(sender=" << sender << ", recipient=" << recipient
+       << ", amount=" << amount << ", signature=" << signature
+       << ", gasLimit=" << gasLimit << ")";
     return ss.str();
-}
-
-std::string Transaction::getSignature() const
-{
-    return signature;
-}
-int64_t Transaction::getGasLimit() const
-{
-    return gasLimit;
 }

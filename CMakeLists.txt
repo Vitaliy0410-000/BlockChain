@@ -20,6 +20,7 @@ add_executable(testChain main.cpp
     Virtual_Machine.h Virtual_Machine.cpp
     SmartContractParser.h SmartContractParser.cpp
     AstNode.h AstNode.cpp
+    Node.h Node.cpp
 )
 
 find_package(nlohmann_json 3.12.0 REQUIRED)
@@ -51,6 +52,18 @@ if (OPENSSL_FOUND)
 else()
     message(FATAL_ERROR "OpenSSL not found! Please install OpenSSL development libraries.")
 endif()
+
+# ---- Boost (Asio) ----
+find_package(Boost REQUIRED COMPONENTS system thread)
+
+if (Boost_FOUND)
+    message(STATUS "Boost found: ${Boost_INCLUDE_DIRS}")
+    target_include_directories(testChain PRIVATE ${Boost_INCLUDE_DIRS})
+    target_link_libraries(testChain PRIVATE Boost::system Boost::thread pthread)
+else()
+    message(FATAL_ERROR "Boost not found! Please install Boost libraries.")
+endif()
+
 
 include(GNUInstallDirs)
 install(TARGETS testChain

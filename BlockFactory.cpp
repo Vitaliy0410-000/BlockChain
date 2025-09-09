@@ -5,7 +5,7 @@
 #include <memory>
 #include <ctime>
 #include "BlockFactory.h"
-
+#include "Node.h"
 std::unique_ptr<Block> GenesisFactory::createGenesis() const
 {
     Logger::getInstance().log("Created block type: GENESIS BLOCK");
@@ -20,10 +20,10 @@ std::unique_ptr<Block> RegularBlockFactory::createRegularBlock(int index, long l
 }
 
 // Реализация BlockChainFactory
-Blockchain& BlockChainFactory::createBlockChain(int difficulty) const
+Blockchain& BlockChainFactory::createBlockChain(int difficulty,const std::string& host, unsigned short port) const
 {
     Logger::getInstance().log("Created block type: BLOCKCHAIN");
-    return Blockchain::getInstance(difficulty);
+    return Blockchain::getInstance(difficulty, host, port);
 }
 
 
@@ -51,9 +51,9 @@ std::unique_ptr<Block> GeneralFactory::createRegularBlock(int index, long long t
     return regularBlockFactory.createRegularBlock(index, timestamp, transactions, prevHash, nonce);
 }
 
-Blockchain& GeneralFactory::createBlockchain(int difficulty) const
+Blockchain& GeneralFactory::createBlockchain(int difficulty,const std::string& host, unsigned short port) const
 {
-    return blockchainFactory.createBlockChain(difficulty);
+    return blockchainFactory.createBlockChain(difficulty,host,port);
 }
 
 

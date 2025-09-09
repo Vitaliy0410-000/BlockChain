@@ -4,7 +4,6 @@
 #include "Block.h"
 #include <memory>
 
-
 class Blockchain;
 
 class GenesisFactory
@@ -22,7 +21,7 @@ public:
 class BlockChainFactory
 {
 public:
-    Blockchain& createBlockChain(int difficulty) const;
+    Blockchain& createBlockChain(int difficulty,const std::string& host, unsigned short port) const;
 };
 
 class GeneralFactory
@@ -40,7 +39,7 @@ public:
     static GeneralFactory& getInstance();
     std::unique_ptr<Block> createGenesis() const;
     std::unique_ptr<Block> createRegularBlock(int index, long long timestamp, std::vector<Transaction> transactions, std::string prevHash, int nonce) const;
-    Blockchain& createBlockchain(int difficulty) const;
+    Blockchain& createBlockchain(int difficulty, const std::string& host, unsigned short port) const;
 };
 GeneralFactory& getGeneralFactory();
 
