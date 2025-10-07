@@ -1,0 +1,8 @@
+/home/vitaliy/Рабочий стол/QT/testChain/CMakeFiles/testChain.dir
+/home/vitaliy/Рабочий стол/QT/testChain/CMakeFiles/testChain2.dir
+/home/vitaliy/Рабочий стол/QT/testChain/CMakeFiles/edit_cache.dir
+/home/vitaliy/Рабочий стол/QT/testChain/CMakeFiles/rebuild_cache.dir
+/home/vitaliy/Рабочий стол/QT/testChain/CMakeFiles/list_install_components.dir
+/home/vitaliy/Рабочий стол/QT/testChain/CMakeFiles/install.dir
+/home/vitaliy/Рабочий стол/QT/testChain/CMakeFiles/install/local.dir
+/home/vitaliy/Рабочий стол/QT/testChain/CMakeFiles/install/strip.dir

@@ -1,42 +1,27 @@
-#include <fstream>
-#include <string>
+#include "Logger.h"
 #include <ctime>
 #include <iomanip>
 #include <sstream>
-#include "Logger.h"
-#include <mutex>
 #include <iostream>
-
-    std::mutex  mtx;
-    std::ofstream file;
-    Logger::Logger()  : file("/home/vitaliy/Рабочий стол/QT/testChain/log.txt",std::ios::app)
-    {
-
-        if(!file.is_open())
-        {
-            throw std::runtime_error("Failed to open log.txt");
-        }
-    };
-  Logger&   Logger:: getInstance()
-    {
-        static Logger instance;
-        return instance;
+Logger::Logger(const std::string& filename) {
+    logFile.open(filename, std::ios::app);
+    if (!logFile.is_open()) {
+        std::cerr << "Failed to open log file: " + filename << std::endl;
+        throw std::runtime_error("Failed to open log file: " + filename);
     }
+}
 
-    void  Logger:: log(const std::string& message)
-    {
-        std::lock_guard<std::mutex>lock(mtx);
-        std::time_t currentTime= std::time(nullptr);
-        std::tm* localTime = std::localtime(&currentTime);
-        std::stringstream ss;
-        ss<<std::put_time(localTime,"%Y-%m-%d %H:%M:%S");
-        std::string timestamp=ss.str();
+Logger& Logger::getInstance(const std::string& filename) {
+    static Logger instance(filename);
+    return instance;
+}
 
-        file<<" [" << timestamp<< "] "<<message<<"\n";file.flush();
-
-
-    }
-      Logger::~Logger()
-    {
-       file.close();
-    }
+void Logger::log(const std::string& message) {
+    std::lock_guard<std::mutex> lock(logMutex);
+    auto now = std::time(nullptr);
+    std::stringstream ss;
+    ss << "[" << std::put_time(std::localtime(&now), "%Y-%m-%d %H:%M:%S") << "] " << message;
+    logFile << ss.str() << std::endl;
+    logFile.flush();
+    std::cout << ss.str() << std::endl; // Вывод в терминал для отладки
+}

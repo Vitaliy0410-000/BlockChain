@@ -1,35 +1,54 @@
- [2025-09-03 20:02:22]  === New Test Session ===
- [2025-09-03 20:02:22] Starting blockchain test
- [2025-09-03 20:02:22] Created block type: GENESIS BLOCK
- [2025-09-03 20:02:22] Create Genesis block with index=0
- [2025-09-03 20:02:22] Started mining Genesis block in 4 threads
- [2025-09-03 20:02:22] Mined Genesis block: nonce=39892, hash=0000346cd09643bfaf1233e891e1fd38faad7d1998551ca8d1de0d5f3e09a0ce
- [2025-09-03 20:02:22] Initialized Blockchain with Genesis block
- [2025-09-03 20:02:22] Blockchain getInstance called
- [2025-09-03 20:02:22] Creating transaction with bytecode: PUSH 100, SSTORE
- [2025-09-03 20:02:22] Adding block with 2 transactions
- [2025-09-03 20:02:22] Chain size: 1
- [2025-09-03 20:02:22] Created block type: REGULAR BLOCK
- [2025-09-03 20:02:22] Create Regular block with index=1
- [2025-09-03 20:02:22] Started mining Regular block in 4 threads
- [2025-09-03 20:02:22] Mined Regular block: nonce=109865, hash=00007fc626f7fc576b54f5a680a51475c20bf0b3424edfda0750002623a1fd45
- [2025-09-03 20:02:22] Executing contract for transaction: Transaction(sender=Alice, recipient=Bob, amount=10.5, signature=fake, gasLimit=1000)
- [2025-09-03 20:02:22] Executing contract for transaction: Transaction(sender=Alice, recipient=Bob, amount=10.5, signature=sig5, gasLimit=1000)
- [2025-09-03 20:02:22] Added block with index=1
- [2025-09-03 20:02:22] Block added, getting chain info
- [2025-09-03 20:02:22] getChainInfo: chain size = 2
- [2025-09-03 20:02:22] Processing block with index=0
- [2025-09-03 20:02:22] Block has 0 transactions
- [2025-09-03 20:02:22] Processing block with index=1
- [2025-09-03 20:02:22] Block has 2 transactions
- [2025-09-03 20:02:22] Chain info: [
+[2025-09-30 21:33:07]  === New Test Session (Node 1) ===
+[2025-09-30 21:33:07] Starting blockchain test
+[2025-09-30 21:33:07] Node 1 is running. Press Ctrl+C to stop.
+[2025-09-30 21:33:07] Created block type: GENESIS BLOCK
+[2025-09-30 21:33:07] Create Genesis block with index=0
+[2025-09-30 21:33:07] Started mining Genesis block in 4 threads
+[2025-09-30 21:33:07] Mined Genesis block: nonce=94978, hash=0000d94176c80c09636045486bf9855c7744cc930eebecbd80b40658767160a9
+[2025-09-30 21:33:07] Initialized Blockchain with Genesis block
+[2025-09-30 21:33:07] Host initialized: 127.0.0.1
+[2025-09-30 21:33:07] Port initialized: 12346
+[2025-09-30 21:33:07] Blockchain reference initialized
+[2025-09-30 21:33:07] Node initialized at 127.0.0.1:12346
+[2025-09-30 21:33:07] Create node
+[2025-09-30 21:33:07] Blockchain getInstance called
+[2025-09-30 21:33:07] Before starting node
+[2025-09-30 21:33:07] Starting node from Blockchain
+[2025-09-30 21:33:07] Node starting at 127.0.0.1:12346
+[2025-09-30 21:33:07] Node started at 127.0.0.1:12346
+[2025-09-30 21:33:07] After starting node
+[2025-09-30 21:33:07] Connecting to peer 127.0.0.1:12347
+[2025-09-30 21:33:07] Connecting to peer from Blockchain: 127.0.0.1:12347
+[2025-09-30 21:33:07] Connecting to peer from Blockchain: 127.0.0.1:12347
+[2025-09-30 21:33:07] Connect error to 127.0.0.1:12347: connect: Connection refused [system:111 at /usr/include/boost/asio/detail/reactive_socket_service.hpp:587 in function 'connect']
+[2025-09-30 21:33:08] Connecting to peer from Blockchain: 127.0.0.1:12347
+[2025-09-30 21:33:08] Connect error to 127.0.0.1:12347: connect: Connection refused [system:111 at /usr/include/boost/asio/detail/reactive_socket_service.hpp:587 in function 'connect']
+[2025-09-30 21:33:09] Connecting to peer from Blockchain: 127.0.0.1:12347
+[2025-09-30 21:33:09] Connect error to 127.0.0.1:12347: connect: Connection refused [system:111 at /usr/include/boost/asio/detail/reactive_socket_service.hpp:587 in function 'connect']
+[2025-09-30 21:33:10] Creating transaction with bytecode: PUSH 100, SSTORE
+[2025-09-30 21:33:10] Adding block with 2 transactions
+[2025-09-30 21:33:10] Chain size: 1
+[2025-09-30 21:33:10] Created block type: REGULAR BLOCK
+[2025-09-30 21:33:10] Create Regular block with index=1
+[2025-09-30 21:33:10] Started mining Regular block in 4 threads
+[2025-09-30 21:33:11] Mined Regular block: nonce=404580, hash=000058ee62668dd69b0d24796f8ca303b69074cde5166802789da161bc5a497a
+[2025-09-30 21:33:11] Executing contract for transaction: Transaction(sender=Alice, recipient=Bob, amount=10.5, signature=fake, gasLimit=1000)
+[2025-09-30 21:33:11] Executing contract for transaction: Transaction(sender=Alice, recipient=Bob, amount=10.5, signature=sig5, gasLimit=1000)
+[2025-09-30 21:33:11] Added block with index=1
+[2025-09-30 21:33:11] Block added, getting chain info
+[2025-09-30 21:33:11] getChainInfo: chain size = 2
+[2025-09-30 21:33:11] Processing block with index=0
+[2025-09-30 21:33:11] Block has 0 transactions
+[2025-09-30 21:33:11] Processing block with index=1
+[2025-09-30 21:33:11] Block has 2 transactions
+[2025-09-30 21:33:11] Chain info: [
     {
-        "hash": "0000346cd09643bfaf1233e891e1fd38faad7d1998551ca8d1de0d5f3e09a0ce",
+        "hash": "0000d94176c80c09636045486bf9855c7744cc930eebecbd80b40658767160a9",
         "index": 0,
         "transactions": []
     },
     {
-        "hash": "00007fc626f7fc576b54f5a680a51475c20bf0b3424edfda0750002623a1fd45",
+        "hash": "000058ee62668dd69b0d24796f8ca303b69074cde5166802789da161bc5a497a",
         "index": 1,
         "transactions": [
             {
@@ -49,18 +68,46 @@
         ]
     }
 ]
- [2025-09-03 20:02:22] Validating chain with size: 2
- [2025-09-03 20:02:22] Chain is valid
- [2025-09-03 20:02:22] Running testBlockchain
- [2025-09-03 20:02:22] Running testBlockchain with 4 transactions
- [2025-09-03 20:02:22] Chain size: 2
- [2025-09-03 20:02:22] Created block type: REGULAR BLOCK
- [2025-09-03 20:02:22] Create Regular block with index=2
- [2025-09-03 20:02:22] Started mining Regular block in 4 threads
- [2025-09-03 20:02:22] Mined Regular block: nonce=134796, hash=000098c2f1a0b572823c92c14f47467e463826be4bd923526a17e608fd6fdb8c
- [2025-09-03 20:02:22] Executing contract for transaction: Transaction(sender=Alice, recipient=Bob, amount=10, signature=sig1, gasLimit=1000)
- [2025-09-03 20:02:22] Executing contract for transaction: Transaction(sender=Bob, recipient=Alice, amount=20, signature=sig2, gasLimit=1000)
- [2025-09-03 20:02:22] Executing contract for transaction: Transaction(sender=Alice, recipient=Bob, amount=15, signature=sig3, gasLimit=1000)
- [2025-09-03 20:02:22] Executing contract for transaction: Transaction(sender=Bob, recipient=Alice, amount=5, signature=sig4, gasLimit=1000)
- [2025-09-03 20:02:22] Added block with index=2
- [2025-09-03 20:02:22] GlobalState after tests: Alice=79.000000, Bob=71.000000
+[2025-09-30 21:33:11] Validating chain with size: 2
+[2025-09-30 21:33:11] Chain is valid
+[2025-09-30 21:33:11] Running testBlockchain
+[2025-09-30 21:33:11] Running testBlockchain with 4 transactions
+[2025-09-30 21:33:11] Chain size: 2
+[2025-09-30 21:33:11] Created block type: REGULAR BLOCK
+[2025-09-30 21:33:11] Create Regular block with index=2
+[2025-09-30 21:33:11] Started mining Regular block in 4 threads
+[2025-09-30 21:33:11] Mined Regular block: nonce=480956, hash=00007054387e7a5bc0a54243375ddd1c611ef073b9490c3bdef5c2835856e496
+[2025-09-30 21:33:11] Executing contract for transaction: Transaction(sender=Alice, recipient=Bob, amount=10, signature=sig1, gasLimit=1000)
+[2025-09-30 21:33:11] Executing contract for transaction: Transaction(sender=Bob, recipient=Alice, amount=20, signature=sig2, gasLimit=1000)
+[2025-09-30 21:33:11] Executing contract for transaction: Transaction(sender=Alice, recipient=Bob, amount=15, signature=sig3, gasLimit=1000)
+[2025-09-30 21:33:11] Executing contract for transaction: Transaction(sender=Bob, recipient=Alice, amount=5, signature=sig4, gasLimit=1000)
+[2025-09-30 21:33:11] Added block with index=2
+[2025-09-30 21:33:11] GlobalState after tests: Alice=79.000000, Bob=71.000000
+[2025-09-30 21:33:11] Node 1 is running. Press Ctrl+C to stop.
+[2025-09-30 21:33:14]  === New Test Session (Node 2) ===
+[2025-09-30 21:33:14] Created block type: GENESIS BLOCK
+[2025-09-30 21:33:14] Create Genesis block with index=0
+[2025-09-30 21:33:14] Started mining Genesis block in 4 threads
+[2025-09-30 21:33:14] Mined Genesis block: nonce=39892, hash=0000346cd09643bfaf1233e891e1fd38faad7d1998551ca8d1de0d5f3e09a0ce
+[2025-09-30 21:33:14] Initialized Blockchain with Genesis block
+[2025-09-30 21:33:14] Host initialized: 127.0.0.1
+[2025-09-30 21:33:14] Port initialized: 12347
+[2025-09-30 21:33:14] Blockchain reference initialized
+[2025-09-30 21:33:14] Node initialized at 127.0.0.1:12347
+[2025-09-30 21:33:14] Create node
+[2025-09-30 21:33:14] Blockchain getInstance called
+[2025-09-30 21:33:14] Before starting node
+[2025-09-30 21:33:14] Starting node from Blockchain
+[2025-09-30 21:33:14] Node starting at 127.0.0.1:12347
+[2025-09-30 21:33:14] Node started at 127.0.0.1:12347
+[2025-09-30 21:33:14] After starting node
+[2025-09-30 21:33:14] Starting testChain2
+[2025-09-30 21:33:14] Connecting to peer 127.0.0.1:12346
+[2025-09-30 21:33:14] Connecting to peer from Blockchain: 127.0.0.1:12346
+[2025-09-30 21:33:14] Connecting to peer from Blockchain: 127.0.0.1:12346
+[2025-09-30 21:33:14] Connected to peer: 127.0.0.1:12346
+[2025-09-30 21:33:14] Sending transaction: Charlie -> Dave, amount: 5.0
+[2025-09-30 21:33:14] Added transaction to pool: Transaction(sender=Charlie, recipient=Dave, amount=5, signature=sig6, gasLimit=1000)
+[2025-09-30 21:33:14] Accepted connection from 127.0.0.1
+[2025-09-30 21:33:14] Node 2 is running. Press Ctrl+C to stop.
+[2025-09-30 21:33:14] Sent transaction to 127.0.0.1:12346

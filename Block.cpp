@@ -113,6 +113,7 @@ void Block::addTransaction(Transaction transaction)
 
         auto mineRange = [this, &found, &target, &foundNonce, &foundHash, difficulty](int start, int step)
         {
+            try {
             while (!found)
             {
                 this->nonce = start; // Проверяем число
@@ -125,6 +126,10 @@ void Block::addTransaction(Transaction transaction)
                     return;
                 }
                 start += step; // Берём следующее число (0,4,8,...)
+            }
+            }catch(const std::exception& e)
+            {
+                Logger::getInstance().log("Error in mining thread: " + std::string(e.what()));
             }
         };
 
